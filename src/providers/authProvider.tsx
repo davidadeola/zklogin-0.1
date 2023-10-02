@@ -9,6 +9,8 @@ import { jwtToAddress } from "@mysten/zklogin";
 import useLocalStorage from "@/hooks/data/useLocalStorage";
 import { AuthContextValue, User } from "@/types/context";
 import { useRouter } from "next/router";
+import loadingAnimationData from "../components/interface/animations/login.json";
+import { useLottie } from "@/hooks/useLottie";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -23,6 +25,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [jwt, setJwt] = useLocalStorage("jwt", "");
   const [loading, setLoading] = useState(false);
+
+  const loadingContainer = useLottie(loadingAnimationData, true);
 
   const logout = useCallback(() => {
     setJwt("");
@@ -61,7 +65,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={{ setJwt, user, logout, loading }}>
-      {loading ? "" : children}
+      {loading ? (
+        <div className="min-w-[20px]" ref={loadingContainer} />
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
