@@ -22,10 +22,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const { push, pathname } = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [jwt, setJwt] = useLocalStorage("jwt", "");
+  const [loading, setLoading] = useState(false);
+
+  const logout = useCallback(() => {
+    setJwt("");
+    setUser(null);
+  }, [setJwt]);
 
   const reAuthenticate = useCallback(async () => {
     if (!jwt) return;
     try {
+      setLoading(true);
       const response = await fetch(`/api/auth?jwt=${jwt}`);
       const result = await response.json();
       const salt = result.salt;
@@ -39,13 +46,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     } catch (error) {
       console.error(error);
+      // if (error === "JWK has expired") logout()
     }
+    setLoading(false);
   }, [jwt]);
-
-  const logout = useCallback(() => {
-    setJwt("");
-    setUser(null);
-  }, [setJwt]);
 
   useEffect(() => {
     if (!jwt && PROTECTED_ROUTES.includes(pathname)) push("/login");
@@ -56,8 +60,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [reAuthenticate]);
 
   return (
-    <AuthContext.Provider value={{ setJwt, user, logout }}>
-      {children}
+    <AuthContext.Provider value={{ setJwt, user, logout, loading }}>
+      {loading ? "" : children}
     </AuthContext.Provider>
   );
 };

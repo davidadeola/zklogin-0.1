@@ -18,4 +18,5 @@ export interface AuthContextValue {
   setJwt: Dispatch<SetStateAction<string>>;
   user: User | null;
   logout: () => void;
+  loading: boolean;
 }
