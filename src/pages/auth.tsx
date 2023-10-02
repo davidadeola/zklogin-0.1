@@ -1,8 +1,11 @@
 import useAuthContext from "@/hooks/context/useAuthContext";
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
+import loadingAnimationData from "../components/interface/animations/login.json";
+import { useLottie } from "@/hooks/useLottie";
 
 const AuthPage = () => {
+  const loadingContainer = useLottie(loadingAnimationData, true);
   const { push } = useRouter();
   const { setJwt } = useAuthContext();
 
@@ -20,7 +23,7 @@ const AuthPage = () => {
     }
   }, [push, setJwt]);
 
-  return <div>Loading...</div>;
+  return <div ref={loadingContainer}>Loading...</div>;
 };
 
 export default AuthPage;

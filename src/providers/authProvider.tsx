@@ -39,6 +39,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(true);
       const response = await fetch(`/api/auth?jwt=${jwt}`);
       const result = await response.json();
+      if (result && typeof result !== "object") {
+        throw new Error("Response is not in JSON format");
+      }
       const salt = result.salt;
       if (salt) {
         const address = jwtToAddress(jwt, salt);
