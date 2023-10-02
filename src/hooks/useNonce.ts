@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { MetaData } from "@/types/context";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import { generateNonce, generateRandomness } from "@mysten/zklogin";

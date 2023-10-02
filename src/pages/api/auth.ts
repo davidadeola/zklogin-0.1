@@ -9,7 +9,7 @@ export default async function handler(
   response: NextApiResponse<ResponseData>
 ) {
   const requestData = {
-    jwt: request.query["token"],
+    jwt: request.query["jwt"],
   };
 
   try {

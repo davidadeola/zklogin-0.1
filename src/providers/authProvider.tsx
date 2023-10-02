@@ -6,58 +6,60 @@ import {
   useEffect,
 } from "react";
 import { jwtToAddress } from "@mysten/zklogin";
+import useLocalStorage from "@/hooks/data/useLocalStorage";
+import { AuthContextValue, User } from "@/types/context";
+import { useRouter } from "next/router";
 
-const AuthContext = createContext<{} | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [userToken, setUserToken] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>("");
+const PROTECTED_ROUTES = ["/", "/dashboard"];
 
-  // Fetch salt
-  const fetchSalt = useCallback(async (idToken: string) => {
-    if (!idToken) return;
+const AuthProvider = ({ children }: AuthProviderProps) => {
+  const { push, pathname } = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [jwt, setJwt] = useLocalStorage("jwt", "");
+
+  const reAuthenticate = useCallback(async () => {
+    if (!jwt) return;
     try {
-      const response = await fetch(`/api/auth?token=${idToken}`);
+      const response = await fetch(`/api/auth?jwt=${jwt}`);
       const result = await response.json();
-      if (result && typeof result !== "object") {
-        throw new Error("Response is not in JSON format");
+      const salt = result.salt;
+      if (salt) {
+        const address = jwtToAddress(jwt, salt);
+        setUser({
+          jwt,
+          salt,
+          address,
+        });
       }
-      return result.salt;
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [jwt]);
 
-  const getAddress = useCallback(async (token: string, salt: bigint) => {
-    const userAddress = jwtToAddress(token, salt);
-    setAddress(userAddress);
-  }, []);
-
-  const fetchSaltAndGetAddress = useCallback(async () => {
-    if (userToken) {
-      const salt = await fetchSalt(userToken);
-      console.log(salt);
-      if (salt) getAddress(userToken, salt);
-    }
-  }, [fetchSalt, getAddress, userToken]);
-  console.log(address);
+  const logout = useCallback(() => {
+    setJwt("");
+    setUser(null);
+  }, [setJwt]);
 
   useEffect(() => {
-    fetchSaltAndGetAddress();
-  }, [fetchSaltAndGetAddress]);
+    if (!jwt && PROTECTED_ROUTES.includes(pathname)) push("/login");
+  }, [jwt, pathname, push]);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.slice(1));
-    const idToken = params.get("id_token");
-    setUserToken(idToken);
-  }, []);
+    reAuthenticate();
+  }, [reAuthenticate]);
 
-  return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ setJwt, user, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export { AuthContext };
