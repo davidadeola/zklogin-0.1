@@ -6,3 +6,8 @@ export interface MetaData {
   randomness: bigint;
   nonce: string;
 }
+
+export interface AuthContextValue {
+  metadata: MetaData | null;
+  logout: () => void;
+}

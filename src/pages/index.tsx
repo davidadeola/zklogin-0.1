@@ -23,7 +23,12 @@ export default function Home() {
   return (
     <>
       <h1>ZKLogin Demo</h1>
-      <Link href={loginURL}>Login to Google</Link>
+      <Link
+        className="flex text-lg items-center justify-center border-solid border-[2px] border-gray-200 w-full gap-2 pr-4 rounded-md text-gray-700 hover:bg-gray-200 max-w-[20em] font-bold"
+        href={loginURL}
+      >
+        Login to Google
+      </Link>
     </>
   );
 }
