@@ -13,8 +13,7 @@ const AuthPage = () => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.slice(1));
     const jwt = params.get("id_token");
-    // setTimeout(() => {
-    // }, 5000);
+
     if (jwt) {
       setJwt(jwt);
       push("/dashboard");
