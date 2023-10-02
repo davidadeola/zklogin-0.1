@@ -4,13 +4,15 @@ import Link from "next/link";
 import googleAnimationData from "../components/interface/animations/google.json";
 import loginAnimationData from "../components/interface/animations/login.json";
 
+const REDIRECT_URI =
+  process.env.NODE_ENV === "production"
+    ? "https://zklogin-demo.vercel.app/auth"
+    : "http://localhost:3000/auth";
+
 export default function Home() {
-  const REDIRECT_URI = "http://localhost:3000/auth";
   const { nonce } = useNonce();
   const googleContainer = useLottie(googleAnimationData, 2);
   const loginContainer = useLottie(loginAnimationData, true);
-
-  // const REDIRECT_URI = `${apiUrl}/dashboard`;
 
   const params = new URLSearchParams({
     state: new URLSearchParams({
