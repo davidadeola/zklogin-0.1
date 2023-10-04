@@ -23,8 +23,10 @@ export default function Home() {
     redirect_uri: "https://zklogin-dev-redirect.vercel.app/api/auth",
     response_type: "id_token",
     scope: "openid",
-    nonce: nonce || "",
   });
+  if (nonce) {
+    params.append("nonce", nonce);
+  }
 
   const loginURL = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 
